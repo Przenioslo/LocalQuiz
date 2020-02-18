@@ -1,5 +1,6 @@
 # allows to add DEPLOYMENTFOLDERS and links to the Felgo library and QtCreator auto-completion
-CONFIG += felgo
+CONFIG += felgo network
+CONFIG += felgo-live
 
 # uncomment this line to add the Live Client Module and use live reloading with your custom C++ code
 # for the remaining steps to build a custom Live Code Reload app see here: https://felgo.com/custom-code-reload-app/
@@ -15,7 +16,7 @@ PRODUCT_VERSION_CODE = 1
 # main.qml file (App::licenseKey for your app or GameWindow::licenseKey for your game)
 # Only used for local builds and Felgo Cloud Builds (https://felgo.com/cloud-builds)
 # Not used if using Felgo Live
-PRODUCT_LICENSE_KEY = ""
+PRODUCT_LICENSE_KEY = "544EE322E7E9BAF3272461E8C74BBA7F312029E8D5B626373B2A120143BB9EEB59D05900102538537488E5D0AE74C3A12D99C9B4B6826989390CCA2AA5988FCB3C2AF665AED4A52FC70B799A2839115CE7C438CC62B67B53DBC1B25CF6EDB796183F32B004F0597232968917041C4DA6A55084CC464F44687EE04117CCB860BC6F97344B8FBB4865DF6A004E9CB47D1B8B633DBAD65598C2E3E2B2B1203B1EF747BBFE1BCD9D1D8B70A793ADF31945C60C1E1BE922A69BE19ED5A5F3625008A69EF1665C3BEB2912EEEDC655BA479D95D1583BA4ECB6979534C5451ACC433A594F28C51BADD69D68B30DED464CE26DE9F568CB4DB0439441F6E6B07131393804F0DF1AD31F4ACB6B9A340BA09F50FE378840D5E45A979DDF72DF996CC7DE39606AFA038D5E2771BA749B4210408089EFEDF41170341F3FB02039397CD12371F36BE42A909263BEAA57CEFA2E4AF237E4";
 
 qmlFolder.source = qml
 DEPLOYMENTFOLDERS += qmlFolder # comment for publishing
@@ -38,7 +39,8 @@ RESOURCES += #    resources.qrc # uncomment for publishing
 
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    cquizserver.cpp
 
 
 android {
@@ -58,3 +60,6 @@ win32 {
 macx {
     ICON = macx/app_icon.icns
 }
+
+HEADERS += \
+    cquizserver.h
