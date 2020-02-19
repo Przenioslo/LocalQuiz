@@ -3,25 +3,21 @@
 
 #include <QObject>
 #include <QTcpServer>
-#include <QTcpSocket>
 #include <QSet>
 #include <QPair>
 #include <memory>
 
+#include "cquizclient.h"
+
 /**
  * @brief	A shared pointer for the tcp socket type
  */
-using socketPtr = std::shared_ptr<QTcpSocket>;
-
-/**
- * @brief	A single socket descriptor
- */
-using socketObj = QPair<std::shared_ptr<QTcpSocket>, qintptr>;
+using ClientPtr = std::shared_ptr<CQuizClient>;
 
 /**
  * @brief	A type specifying a list of TCP socket connections
  */
-using SocketList = QList<socketObj>;
+using ClientList = QList<ClientPtr>;
 
 /**
  * @brief	A class providing the quiz hosting interface
@@ -45,9 +41,12 @@ public:
 private slots:
 
 	void onNewConnections();
-	void onClientDisconnected();
+	void onClientDisconnected(const qintptr desc);
 
 private:
+
+	ClientPtr makeNextClient(SocketPtr socket);
+	void removeDeadClients();
 
 	/**
 	 * @brief	The Quiz host server
@@ -57,7 +56,7 @@ private:
 	/**
 	 * @brief	A list of connected Quiz clients
 	 */
-	SocketList m_clients;
+	ClientList m_clients;
 
 	/**
 	 * @brief	The listening port.

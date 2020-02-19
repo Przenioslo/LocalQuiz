@@ -40,6 +40,7 @@ RESOURCES += #    resources.qrc # uncomment for publishing
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
+    cquizclient.cpp \
     cquizserver.cpp
 
 
@@ -62,4 +63,5 @@ macx {
 }
 
 HEADERS += \
+    cquizclient.h \
     cquizserver.h

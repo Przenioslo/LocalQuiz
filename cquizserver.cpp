@@ -21,7 +21,6 @@ CQuizServer::CQuizServer(const int port, const bool sStart, QObject *parent) :
 CQuizServer::~CQuizServer()
 {
 	qDebug() << __func__ << "destructor called";
-
 	stop();
 }
 
@@ -56,10 +55,10 @@ void CQuizServer::stop()
 			this, &CQuizServer::onNewConnections);
 
 	// disconnect all clients
-	for (const auto& client : m_clients)
+	for (const auto& c : m_clients)
 	{
-		qDebug() << "Attempting client" << client.second << "disconnection";
-		client.first->disconnectFromHost();
+		qDebug() << "Attempting client" << c->descriptor() << "disconnection";
+		c->disconnect();
 	}
 
 	// close the server
@@ -76,36 +75,59 @@ void CQuizServer::stop()
  */
 void CQuizServer::onNewConnections()
 {
-	socketPtr socket;
+	SocketPtr socket;
 
-	while ((socket = socketPtr(m_server.nextPendingConnection())))
+	while ((socket = SocketPtr(m_server.nextPendingConnection())))
 	{
-		connect(socket.get(), &QTcpSocket::disconnected,
-				this, &CQuizServer::onClientDisconnected);
-
-		const auto desc = socket->socketDescriptor();
-		m_clients.append(socketObj(std::move(socket), desc));
-
-		qDebug() << "Client" << desc << "connected";
+		ClientPtr cp;
+		if ((cp = makeNextClient(socket)))
+			qDebug() << "Client" << cp->descriptor() << "connected";
 	}
 }
 
 /**
  * @brief	The slot should be called each time any of
- *			the connected client disconnets.
+ *			the connected client disconnects.
+ * @param	desc: socket descriptor of the disconnected client.
  */
-void CQuizServer::onClientDisconnected()
+void CQuizServer::onClientDisconnected(const qintptr desc)
 {
-	for (auto i = 0; i < m_clients.size(); i++)
+	qDebug() << "Client" << desc << "disconnected from the server";
+	removeDeadClients();
+}
+
+/**
+ * @brief	A new connected socket is added to the list. In case there are
+ *			disconnected clients in the list, they are utilized. Otherwise
+ *			new one is appended.
+ * @param	socket: socket to be tied.
+ * @return	Obtains the new client.
+ */
+ClientPtr CQuizServer::makeNextClient(SocketPtr socket)
+{
+	ClientPtr cp = std::make_shared<CQuizClient>(socket);
+	m_clients.append(cp);
+
+	connect(cp.get(), &CQuizClient::disconnected,
+			this, &CQuizServer::onClientDisconnected);
+
+	return cp;
+}
+
+/**
+ * @brief	Removes all of the diconnected clients from the server cache
+ */
+void CQuizServer::removeDeadClients()
+{
+	QMutableListIterator<ClientPtr> i(m_clients);
+	while (i.hasNext())
 	{
-		if (m_clients[i].first->state() == QAbstractSocket::UnconnectedState)
-		{
-			qDebug() << "Client" << m_clients[i].second << "disconnected";
-			m_clients.removeAt(i);
-			break;
-		}
+		if (!i.next()->socketConnected())
+			i.remove();
 	}
 }
+
+
 
 
 
