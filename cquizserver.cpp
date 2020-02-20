@@ -1,6 +1,7 @@
 #include <QDebug>
 
 #include "cquizserver.h"
+#include "ccompacket.h"
 
 /**
  * @brief	Creates and starts the Quiz server module.
@@ -11,6 +12,13 @@
 CQuizServer::CQuizServer(const int port, const bool sStart, QObject *parent) :
 	QObject(parent), m_port{port}
 {
+	CComPacket tmp;
+	tmp.m_cmd = CComPacket::Cmd::GiveName;
+	tmp.m_data = 5.112233;
+
+	QByteArray ba = tmp.serialize();
+	CComPacket tmp2 = CComPacket::deserialize(ba);
+
 	if (sStart)
 		start();
 }
@@ -92,7 +100,7 @@ void CQuizServer::onNewConnections()
  */
 void CQuizServer::onClientDisconnected(const qintptr desc)
 {
-	qDebug() << "Client" << desc << "disconnected from the server";
+	qDebug() << "Client" << desc << "lost";
 	removeDeadClients();
 }
 

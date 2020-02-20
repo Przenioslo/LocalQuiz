@@ -1,5 +1,5 @@
 # allows to add DEPLOYMENTFOLDERS and links to the Felgo library and QtCreator auto-completion
-CONFIG += felgo network
+CONFIG += felgo network c++14
 CONFIG += felgo-live
 
 # uncomment this line to add the Live Client Module and use live reloading with your custom C++ code
@@ -40,6 +40,7 @@ RESOURCES += #    resources.qrc # uncomment for publishing
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
+    ccompacket.cpp \
     cquizclient.cpp \
     cquizserver.cpp
 
@@ -63,5 +64,6 @@ macx {
 }
 
 HEADERS += \
+    ccompacket.h \
     cquizclient.h \
     cquizserver.h
